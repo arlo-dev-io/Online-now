@@ -1,5 +1,7 @@
 Online Now 📱
 
+SPECIALLY BUILT FOR POCO C71 MINIMAL
+
 A minimal Android launcher that keeps your home screen simple, clean, and distraction-free.
 
 ## About
