@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+
+      # The signing key is created once and cached, so every build is signed
+      # with the same key and new versions install over old ones.
+      - name: Restore signing key
+        id: keycache
+        uses: actions/cache@v4
+        with:
+          path: signing/release.jks
+          key: online-now-signing-key-v1
+
+      - name: Create signing key (first run only)
+        if: steps.keycache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p signing
+          keytool -genkeypair \
+            -keystore signing/release.jks \
+            -alias onlinenow \
+            -keyalg RSA -keysize 2048 -validity 36500 \
+            -storepass onlinenow-pass -keypass onlinenow-pass \
+            -dname "CN=Online Now"
+
+      - name: Build release APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/signing/release.jks
+          KEYSTORE_PASSWORD: onlinenow-pass
+          KEY_ALIAS: onlinenow
+          KEY_PASSWORD: onlinenow-pass
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk OnlineNow.apk
+
+      - name: Save APK as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OnlineNow
+          path: OnlineNow.apk
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Online Now build ${{ github.run_number }}
+          files: OnlineNow.apk
