@@ -26,6 +26,7 @@ class LauncherState(private val appContext: Context) {
     companion object {
         const val MAX_FAVORITES = 5
         const val MAX_DOCK = 4
+        const val MAX_DRAWER_FAVORITES = 10
     }
 
     // ---- data ----
@@ -33,6 +34,9 @@ class LauncherState(private val appContext: Context) {
         private set
 
     var favorites by mutableStateOf(readList("favorites"))
+        private set
+
+    var drawerFavorites by mutableStateOf(readList("drawer_favorites"))
         private set
 
     var dock by mutableStateOf(if (sp.contains("dock")) readList("dock") else defaultDock())
@@ -128,6 +132,18 @@ class LauncherState(private val appContext: Context) {
             }
         }
         saveList("favorites", favorites)
+    }
+
+    fun toggleDrawerFavorite(pkg: String) {
+        drawerFavorites = when {
+            pkg in drawerFavorites -> drawerFavorites - pkg
+            drawerFavorites.size < MAX_DRAWER_FAVORITES -> drawerFavorites + pkg
+            else -> {
+                toast("Drawer favorites full ($MAX_DRAWER_FAVORITES apps)")
+                drawerFavorites
+            }
+        }
+        saveList("drawer_favorites", drawerFavorites)
     }
 
     fun toggleDock(pkg: String) {
