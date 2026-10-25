@@ -50,7 +50,7 @@ class LauncherState(private val appContext: Context) {
     var accent by mutableStateOf(Color(sp.getInt("accent", DefaultAccent.toArgb())))
         private set
 
-    var monoIcons by mutableStateOf(sp.getBoolean("mono", true))
+    var textScale by mutableStateOf(sp.getFloat("text_scale", 1f))
         private set
 
     // ---- UI flags ----
@@ -158,9 +158,15 @@ class LauncherState(private val appContext: Context) {
         sp.edit().putInt("accent", color.toArgb()).apply()
     }
 
-    fun updateMonoIcons(value: Boolean) {
-        monoIcons = value
-        sp.edit().putBoolean("mono", value).apply()
+    fun changeTextScale(delta: Float) {
+        val v = (Math.round((textScale + delta) * 10) / 10f).coerceIn(0.7f, 1.6f)
+        textScale = v
+        sp.edit().putFloat("text_scale", v).apply()
+    }
+
+    fun resetTextScale() {
+        textScale = 1f
+        sp.edit().putFloat("text_scale", 1f).apply()
     }
 
     // ---- helpers ----
