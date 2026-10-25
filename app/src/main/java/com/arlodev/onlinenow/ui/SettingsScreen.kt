@@ -66,15 +66,15 @@ fun SettingsScreen(state: LauncherState) {
         Section("Accent color") {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 AccentChoices.forEach { color ->
-                    Swatch(color, selected = state.accent == color) { state.setAccent(color) }
+                    Swatch(color, selected = state.accent == color) { state.updateAccent(color) }
                 }
             }
         }
 
         Section("Icons") {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Pill("Monochrome", state.monoIcons) { state.setMonoIcons(true) }
-                Pill("Original", !state.monoIcons) { state.setMonoIcons(false) }
+                Pill("Monochrome", state.monoIcons) { state.updateMonoIcons(true) }
+                Pill("Original", !state.monoIcons) { state.updateMonoIcons(false) }
             }
         }
 
