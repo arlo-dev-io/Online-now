@@ -51,6 +51,6 @@ Ideas and suggestions are welcome! Feel free to open an issue or submit a pull r
 [Choose a license, e.g. MIT]
 
 ## Author
-Made by [Arlo](https://github.com/[your-username])
+Made by [Arlo](https://github.com/arlo-dev-io)
 
 If you like this project, give it a ⭐
