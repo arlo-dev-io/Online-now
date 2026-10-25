@@ -1,90 +1,70 @@
 package com.arlodev.onlinenow.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
+import androidx.compose.ui.unit.sp
 import com.arlodev.onlinenow.AppInfo
 import com.arlodev.onlinenow.LauncherState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-private val MonoFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
-
+/**
+ * An app shown as plain text.
+ * Tap = open app. Long-press = menu. A small accent dot shows when it has notifications.
+ * Text size = baseSize x the user's text-size setting.
+ */
 @Composable
-fun AppIcon(app: AppInfo, size: Dp, mono: Boolean) {
-    val context = LocalContext.current
-    val px = with(LocalDensity.current) { size.roundToPx() }
-
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, app.packageName, px) {
-        value = withContext(Dispatchers.Default) {
-            runCatching {
-                context.packageManager
-                    .getApplicationIcon(app.packageName)
-                    .toBitmap(px, px)
-                    .asImageBitmap()
-            }.getOrNull()
-        }
-    }
-
-    Box(Modifier.size(size).clip(CircleShape)) {
-        bitmap?.let { bmp ->
-            Image(
-                bitmap = bmp,
-                contentDescription = app.label,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(size),
-                colorFilter = if (mono) MonoFilter else null,
-            )
-        }
-    }
-}
-
-/** Tap = open app. Long-press = menu. Shows an accent dot when the app has notifications. */
-@Composable
-fun AppIconButton(
+fun AppWord(
     app: AppInfo,
     state: LauncherState,
-    size: Dp,
     hasNotification: Boolean,
+    baseSize: Float,
+    modifier: Modifier = Modifier,
+    centered: Boolean = false,
 ) {
     val p = LocalPalette.current
-    Box(
-        Modifier
+    Row(
+        modifier
             .pointerInput(app.packageName) {
                 detectTapGestures(
                     onTap = { state.launch(app.packageName) },
                     onLongPress = { state.menuApp = app },
                 )
             }
-            .padding(8.dp)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = if (centered) Arrangement.Center else Arrangement.Start,
     ) {
-        AppIcon(app, size, state.monoIcons)
+        BasicText(
+            app.label,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyle(
+                color = p.text,
+                fontSize = (baseSize * state.textScale).sp,
+                fontWeight = FontWeight.Light,
+                fontFamily = LauncherFont,
+            ),
+            modifier = Modifier.weight(1f, fill = false),
+        )
         if (hasNotification) {
             Box(
                 Modifier
-                    .align(Alignment.TopEnd)
-                    .size(10.dp)
+                    .padding(start = 8.dp)
+                    .size(7.dp)
                     .background(p.accent, CircleShape)
             )
         }
