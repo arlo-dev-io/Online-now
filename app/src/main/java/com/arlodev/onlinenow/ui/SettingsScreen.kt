@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arlodev.onlinenow.LauncherState
+import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen(state: LauncherState) {
@@ -71,11 +72,18 @@ fun SettingsScreen(state: LauncherState) {
             }
         }
 
-        Section("Icons") {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Pill("Monochrome", state.monoIcons) { state.updateMonoIcons(true) }
-                Pill("Original", !state.monoIcons) { state.updateMonoIcons(false) }
+        Section("Text size") {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Pill("A-", selected = false) { state.changeTextScale(-0.1f) }
+                Label("${(state.textScale * 100).roundToInt()}%", size = 18, color = p.text)
+                Pill("A+", selected = false) { state.changeTextScale(0.1f) }
+                Pill("Reset", selected = false) { state.resetTextScale() }
             }
+            Spacer(Modifier.height(16.dp))
+            Label("Online Now", size = (24 * state.textScale).toInt(), color = p.text)
         }
 
         Section("Notification dots") {
