@@ -153,12 +153,12 @@ class LauncherState(private val appContext: Context) {
         sp.edit().putString("theme", mode.name).apply()
     }
 
-    fun setAccent(color: Color) {
+    fun updateAccent(color: Color) {
         accent = color
         sp.edit().putInt("accent", color.toArgb()).apply()
     }
 
-    fun setMonoIcons(value: Boolean) {
+    fun updateMonoIcons(value: Boolean) {
         monoIcons = value
         sp.edit().putBoolean("mono", value).apply()
     }
