@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,16 +25,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arlodev.onlinenow.AppInfo
 import com.arlodev.onlinenow.LauncherState
 import com.arlodev.onlinenow.NotificationState
 import kotlinx.coroutines.delay
@@ -83,8 +78,8 @@ fun HomeScreen(state: LauncherState) {
 
             Spacer(Modifier.weight(1f))
 
-            // favorites: 1 column x 5 rows
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            // favorites: 1 column x 5 rows, words only
+            Column {
                 if (favoriteApps.isEmpty()) {
                     BasicText(
                         "Swipe up, long-press an app, then tap \"Add to home\".",
@@ -97,62 +92,36 @@ fun HomeScreen(state: LauncherState) {
                     )
                 }
                 favoriteApps.forEach { app ->
-                    FavoriteRow(app, state, app.packageName in notified)
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            // dock
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                dockApps.forEach { app ->
-                    AppIconButton(app, state, 52.dp, app.packageName in notified)
+                    AppWord(
+                        app = app,
+                        state = state,
+                        hasNotification = app.packageName in notified,
+                        baseSize = 30f,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
 
             Spacer(Modifier.height(24.dp))
-        }
-    }
-}
 
-@Composable
-private fun FavoriteRow(app: AppInfo, state: LauncherState, hasNotification: Boolean) {
-    val p = LocalPalette.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .pointerInput(app.packageName) {
-                detectTapGestures(
-                    onTap = { state.launch(app.packageName) },
-                    onLongPress = { state.menuApp = app },
-                )
-            },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        BasicText(
-            app.label,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = TextStyle(
-                color = p.text,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Light,
-                fontFamily = LauncherFont,
-            ),
-            modifier = Modifier.weight(1f, fill = false),
-        )
-        if (hasNotification) {
-            Box(
-                Modifier
-                    .padding(start = 12.dp)
-                    .size(8.dp)
-                    .background(p.accent, CircleShape)
-            )
+            // dock: words only, one row
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                dockApps.forEach { app ->
+                    AppWord(
+                        app = app,
+                        state = state,
+                        hasNotification = app.packageName in notified,
+                        baseSize = 16f,
+                        modifier = Modifier.weight(1f),
+                        centered = true,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
