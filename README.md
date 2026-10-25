@@ -1,4 +1,4 @@
-<img width="720" height="1640" alt="image" src="https://github.com/user-attachments/assets/5941ed34-a556-4d40-a3f4-34551b110ff1" />Online Now 📱
+Online Now 📱
 
 A minimal Android launcher that keeps your home screen simple, clean, and distraction-free.
 
@@ -16,7 +16,7 @@ A minimal Android launcher that keeps your home screen simple, clean, and distra
 <!-- Add your screenshots here -->
 | Home Screen | App Drawer |  Hidden Drawer |
 |-------------|------------|-------------|
-|<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /> |<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /> |<img width="250" height="500" alt="image" src="blob:https://web.facebook.com/1adc38fc-ebd6-4933-a279-d22a36ff4613" /> |
+|<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /> |<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /> |<img width="720" height="1640" alt="image" src="https://github.com/user-attachments/assets/5941ed34-a556-4d40-a3f4-34551b110ff1" /> |
 
 ## Getting Started
 
