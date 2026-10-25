@@ -1,4 +1,3 @@
-[README_OnlineNow.md](https://github.com/user-attachments/files/33919114/README_OnlineNow.md)
 # Online Now 📱
 
 A minimal Android launcher that keeps your home screen simple, clean, and distraction-free.
