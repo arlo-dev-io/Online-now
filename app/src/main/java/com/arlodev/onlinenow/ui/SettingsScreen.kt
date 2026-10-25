@@ -106,23 +106,6 @@ fun SettingsScreen(state: LauncherState) {
             }
         }
 
-        Section("Hidden apps (tap to hide or show in drawer)") {
-            state.apps.forEach { app ->
-                val isHidden = app.packageName in state.hidden
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { state.toggleHidden(app.packageName) }
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Label(app.label, size = 18, color = if (isHidden) p.muted else p.text)
-                    Label(if (isHidden) "Hidden" else "Visible", size = 14, color = if (isHidden) p.accent else p.muted)
-                }
-            }
-        }
-
         Spacer(Modifier.height(32.dp))
     }
 }
