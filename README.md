@@ -18,7 +18,7 @@ A minimal Android launcher that keeps your home screen simple, clean, and distra
 <!-- Add your screenshots here -->
 | Home Screen | App Drawer |  Hidden Drawer |
 |-------------|------------|-------------|
-| ![Home]() | ![Drawer]() | ![Hidden Drawer]() |
+| ![Home](<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" />) | ![Drawer]() | ![Hidden Drawer]() |
 
 ## Getting Started
 
