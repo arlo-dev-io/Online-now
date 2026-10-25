@@ -1,4 +1,6 @@
-<img width="720" height="1640" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /># Online Now 📱
+<img width="10.16" height="15.24" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /># 
+
+Online Now 📱
 
 A minimal Android launcher that keeps your home screen simple, clean, and distraction-free.
 
