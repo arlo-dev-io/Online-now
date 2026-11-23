@@ -1,58 +1,64 @@
-Online Now 📱
+# Online Now
 
-SPECIALLY BUILT FOR POCO C71 MINIMAL
+A minimal, dot-matrix Android launcher. Black screen, big dotted clock, real app icons redrawn as dots, and a fast app drawer with search.
 
-A minimal Android launcher that keeps your home screen simple, clean, and distraction-free.
+Built for the **POCO C71** (Android 15), but it works on any Android 15+ phone.
 
-## About
-**Online Now** replaces the cluttered default home screen with a lightweight, minimal one. No extra widgets, no noise. Just the apps you need, when you need them.
+<!-- Add screenshots here: Home | App drawer | Hidden apps | Settings -->
 
 ## Features
-- ✨ Clean, minimal home screen
-- ⚡ Lightweight and fast
-- 🔍 Quick app search
-- 🎯 Distraction-free design
-- [Add more features as you build them]
 
-## Screenshots
-<!-- Add your screenshots here -->
-| Home Screen | App Drawer |  Hidden Drawer |
-|-------------|------------|-------------|
-|<img width="250" height="500" alt="f77582e2-2ea2-4ac4-8cf2-ba7a3011c59a" src="https://github.com/user-attachments/assets/25f25ab2-0822-4ec8-b882-329666f2c480" /> |<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/ef453227-8ffc-4896-8970-7079b43fbec4" /> |<img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/5941ed34-a556-4d40-a3f4-34551b110ff1" /> |
+**Home**
+- Big dot-matrix clock (follows your 12 / 24 hour setting). Tap it to open alarms.
+- Status pills: connection (Wi-Fi / mobile / offline) and battery.
+- Calendar card with the week around today. Tap it to open your calendar.
+- Music card: shows what is playing, with play / pause. Tap the title to open the player.
+- "Tap to play" card: ask the dots a yes / no question.
+- Up to 8 apps in a 4-column grid, with notification dots.
 
-## Getting Started
+**Icons**
+- Every app icon is redrawn as a dot-matrix picture (works with any app, uses themed icons when the app has one).
+- Prefer the real icons? Settings > Icons > Original.
 
-### Requirements
-- Android [minimum version, e.g. 8.0+]
-- Android Studio (if you want to build it yourself)
+**App drawer** (swipe up anywhere)
+- Search as you type. Enter opens the best match.
+- Pinned apps on top, everything else A-Z, with a fast A-Z rail on the right edge.
+- Grid or list layout.
+- **Hidden apps**: tap *Hidden* (or swipe left) to open the hidden page, *Back* (or swipe right) to return. Hidden apps stay out of the drawer and search.
+- Swipe down at the top to close.
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/[your-username]/online-now.git
-   ```
-2. Open the project in Android Studio.
-3. Let Gradle sync, then click **Run** to install it on your device or emulator.
-4. Press the Home button and choose **Online Now** as your default launcher.
+**App menu** (long-press any app)
+Add to / remove from home, move earlier / later, pin in drawer, hide, app info, uninstall.
 
-## Built With
-- [Kotlin / Java]
-- Android SDK
-- [Any other libraries you use]
+**Settings** (long-press the clock or an empty spot on the home screen)
+Theme (system / light / dark), background (black / dim wallpaper / wallpaper), accent color, icon style, label size, which home cards to show, drawer layout, notification access, wallpaper, default launcher.
 
-## Roadmap
-- [ ] Add customizable themes
-- [ ] Add gesture support
-- [ ] Add app hiding
-- [ ] [Your next idea]
+## Install
 
-## Contributing
-Ideas and suggestions are welcome! Feel free to open an issue or submit a pull request.
+Every push builds a signed APK with GitHub Actions. No Android Studio needed.
 
-## License
-[Choose a license, e.g. MIT]
+1. Push this project to GitHub (the *Build and Release* workflow starts by itself).
+2. When it finishes, open the **Releases** page and download `OnlineNow.apk` (or grab it from the workflow run under *Artifacts*).
+3. Install it. New builds install over old ones because every build uses the same signing key.
+4. Press Home and choose **Online Now** as your home app.
+
+### Notification dots and the music card
+Both need notification access: Settings > Access > *Allow*.
+If the switch is greyed out: Settings > Apps > Online Now > three dots > **Allow restricted settings**, then try again.
+
+## Gestures
+
+| Where | Gesture | Does |
+|---|---|---|
+| Home | swipe up | open the app drawer |
+| Home | long-press empty space / the clock | open settings |
+| Drawer | swipe left / right | hidden apps / back |
+| Drawer | swipe down at the top | close |
+| Any app | long-press | app menu |
+
+## Built with
+- Kotlin and Jetpack Compose, no other UI libraries
+- [Space Mono](https://github.com/googlefonts/spacemono) (SIL Open Font License, see `licenses/`)
 
 ## Author
 Made by [Arlo](https://github.com/arlo-dev-io)
-
-If you like this project, give it a ⭐
