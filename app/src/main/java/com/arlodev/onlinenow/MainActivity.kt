@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
+import com.arlodev.onlinenow.ui.DotIcons
 import com.arlodev.onlinenow.ui.LauncherRoot
 
 class MainActivity : ComponentActivity() {
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
 
     private val packageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            DotIcons.clear()
             state.reloadApps()
         }
     }
@@ -24,6 +26,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // no grey scrim behind the 3-button navigation bar
+        window.isNavigationBarContrastEnforced = false
 
         state = LauncherState(applicationContext)
         state.reloadApps()
@@ -37,6 +41,11 @@ class MainActivity : ComponentActivity() {
         ContextCompat.registerReceiver(this, packageReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
 
         setContent { LauncherRoot(state) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        state.onResume()
     }
 
     // Pressing Home while the launcher is already open closes drawer/settings/menu.

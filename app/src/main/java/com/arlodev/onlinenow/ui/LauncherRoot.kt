@@ -3,7 +3,9 @@ package com.arlodev.onlinenow.ui
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -40,14 +42,18 @@ fun LauncherRoot(state: LauncherState) {
         }
     }
 
+    // The launcher is the root screen: Back does nothing here. Overlays register their own
+    // handlers later, which take priority over this one.
+    BackHandler { }
+
     CompositionLocalProvider(LocalPalette provides palette) {
         Box(Modifier.fillMaxSize()) {
             HomeScreen(state)
 
             AnimatedVisibility(
                 visible = state.drawerOpen,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut(),
+                enter = slideInVertically(tween(280)) { it / 3 } + fadeIn(tween(220)),
+                exit = slideOutVertically(tween(220)) { it / 3 } + fadeOut(tween(180)),
             ) {
                 AppDrawer(state)
             }

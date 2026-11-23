@@ -1,19 +1,24 @@
 package com.arlodev.onlinenow.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.arlodev.onlinenow.AppInfo
 import com.arlodev.onlinenow.LauncherState
@@ -22,10 +27,12 @@ import com.arlodev.onlinenow.LauncherState
 fun AppMenu(app: AppInfo, state: LauncherState) {
     val p = LocalPalette.current
     val pkg = app.packageName
-    val isFavorite = pkg in state.favorites
-    val isInDock = pkg in state.dock
-    val isDrawerFavorite = pkg in state.drawerFavorites
-    val isHidden = pkg in state.hidden
+    val shape = RoundedCornerShape(28.dp)
+
+    val homeIndex = state.homeApps.indexOf(pkg)
+    val onHome = homeIndex >= 0
+    val pinned = pkg in state.drawerPinned
+    val hidden = pkg in state.hidden
 
     fun close() {
         state.menuApp = null
@@ -35,36 +42,48 @@ fun AppMenu(app: AppInfo, state: LauncherState) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(28.dp))
-                .background(p.surface)
-                .padding(vertical = 14.dp)
+                .clip(shape)
+                .background(p.card)
+                .border(1.dp, p.border, shape)
+                .padding(vertical = 10.dp)
         ) {
-            BasicText(
-                app.label,
-                style = TextStyle(
-                    color = p.muted,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = LauncherFont,
-                ),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-            )
-            MenuItem(if (isFavorite) "Remove from home" else "Add to home") {
-                state.toggleFavorite(pkg); close()
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AppIcon(app, state, 44.dp, hasNotification = false)
+                Spacer(Modifier.width(14.dp))
+                BasicText(
+                    app.label.uppercase(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = mono(13f, p.text, bold = true, spacing = 1.2f),
+                    modifier = Modifier.weight(1f),
+                )
             }
-            MenuItem(if (isInDock) "Remove from dock" else "Add to dock") {
-                state.toggleDock(pkg); close()
+            Spacer(Modifier.height(4.dp))
+
+            MenuItem(if (onHome) "Remove from home" else "Add to home") {
+                state.toggleHome(pkg); close()
             }
-            MenuItem(if (isDrawerFavorite) "Remove from drawer favorites" else "Add to drawer favorites") {
-                state.toggleDrawerFavorite(pkg); close()
+            if (onHome && homeIndex > 0) {
+                MenuItem("Move earlier") { state.moveHome(pkg, -1); close() }
             }
-            MenuItem(if (isHidden) "Unhide from drawer" else "Hide from drawer") {
+            if (onHome && homeIndex < state.homeApps.size - 1) {
+                MenuItem("Move later") { state.moveHome(pkg, 1); close() }
+            }
+            MenuItem(if (pinned) "Unpin from drawer" else "Pin in drawer") {
+                state.toggleDrawerPin(pkg); close()
+            }
+            MenuItem(if (hidden) "Unhide" else "Hide from drawer") {
                 state.toggleHidden(pkg); close()
             }
             MenuItem("App info") {
                 state.openAppInfo(pkg); close()
             }
-            MenuItem("Uninstall") {
+            MenuItem("Uninstall", color = p.danger) {
                 state.uninstall(pkg); close()
             }
         }
@@ -72,19 +91,13 @@ fun AppMenu(app: AppInfo, state: LauncherState) {
 }
 
 @Composable
-private fun MenuItem(text: String, onClick: () -> Unit) {
-    val p = LocalPalette.current
+private fun MenuItem(text: String, color: Color = LocalPalette.current.text, onClick: () -> Unit) {
     BasicText(
-        text,
-        style = TextStyle(
-            color = p.text,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Light,
-            fontFamily = LauncherFont,
-        ),
+        text.uppercase(),
+        style = mono(12f, color, spacing = 1.4f),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = 24.dp, vertical = 14.dp),
+            .padding(horizontal = 22.dp, vertical = 14.dp),
     )
 }

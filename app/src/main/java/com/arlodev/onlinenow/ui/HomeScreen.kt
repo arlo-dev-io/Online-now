@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.BasicText
@@ -25,13 +27,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.arlodev.onlinenow.AppInfo
 import com.arlodev.onlinenow.LauncherState
 import com.arlodev.onlinenow.NotificationState
 import kotlinx.coroutines.delay
@@ -39,25 +41,34 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+private const val GRID_COLUMNS = 4
+
 @Composable
 fun HomeScreen(state: LauncherState) {
     val p = LocalPalette.current
     val notified by NotificationState.packages.collectAsState()
     var dragTotal by remember { mutableFloatStateOf(0f) }
 
+    var now by remember { mutableStateOf(LocalDateTime.now()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            now = LocalDateTime.now()
+            delay(60_000L - System.currentTimeMillis() % 60_000L)
+        }
+    }
+
     val byPackage = remember(state.apps) { state.apps.associateBy { it.packageName } }
-    val favoriteApps = state.favorites.mapNotNull { byPackage[it] }
-    val dockApps = state.dock.mapNotNull { byPackage[it] }
+    val homeApps = state.homeApps.mapNotNull { byPackage[it] }
 
     Box(
         Modifier
             .fillMaxSize()
-            .background(p.background.copy(alpha = 0.35f))
+            .background(p.background.copy(alpha = state.homeAlpha))
             // swipe up anywhere -> open app drawer
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
                     onDragStart = { dragTotal = 0f },
-                    onDragEnd = { if (dragTotal < -100f) state.drawerOpen = true },
+                    onDragEnd = { if (dragTotal < -90f) state.drawerOpen = true },
                     onDragCancel = { dragTotal = 0f },
                 ) { _, dy -> dragTotal += dy }
             }
@@ -70,105 +81,103 @@ fun HomeScreen(state: LauncherState) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(10.dp))
 
-            ClockBlock(state)
+            if (state.showPills) StatusPills()
+
+            Spacer(Modifier.weight(0.9f))
+
+            ClockBlock(state, now)
+
+            Spacer(Modifier.weight(0.7f))
+
+            if (state.showCalendar) {
+                CalendarCard(state, now.toLocalDate())
+                Spacer(Modifier.height(12.dp))
+            }
+
+            if (state.showMedia || state.showPlay) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(148.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    if (state.showMedia) MediaCard(state, Modifier.weight(1f).fillMaxHeight())
+                    if (state.showPlay) PlayCard(Modifier.weight(1f).fillMaxHeight())
+                }
+            }
 
             Spacer(Modifier.weight(1f))
 
-            // favorites: 1 column x 5 rows, words only
-            Column {
-                if (favoriteApps.isEmpty()) {
-                    BasicText(
-                        "Swipe up, long-press an app, then tap \"Add to home\".",
-                        style = TextStyle(
-                            color = p.muted,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Light,
-                            fontFamily = LauncherFont,
-                        ),
-                    )
-                }
-                favoriteApps.forEach { app ->
-                    AppWord(
-                        app = app,
-                        state = state,
-                        hasNotification = app.packageName in notified,
-                        baseSize = 30f,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
+            HomeGrid(homeApps, state, notified)
 
-            Spacer(Modifier.height(24.dp))
-
-            // dock: words only, one row
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                dockApps.forEach { app ->
-                    AppWord(
-                        app = app,
-                        state = state,
-                        hasNotification = app.packageName in notified,
-                        baseSize = 16f,
-                        modifier = Modifier.weight(1f),
-                        centered = true,
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(12.dp))
         }
     }
 }
 
 @Composable
-private fun ClockBlock(state: LauncherState) {
+private fun ClockBlock(state: LauncherState, now: LocalDateTime) {
     val p = LocalPalette.current
     val context = LocalContext.current
 
-    var now by remember { mutableStateOf(LocalDateTime.now()) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            now = LocalDateTime.now()
-            delay(60_000L - System.currentTimeMillis() % 60_000L)
-        }
-    }
-
     val is24 = DateFormat.is24HourFormat(context)
-    val timeText = now.format(DateTimeFormatter.ofPattern(if (is24) "HH:mm" else "h:mm"))
-    val dateText = now.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault()))
+    val timeText = now.format(DateTimeFormatter.ofPattern(if (is24) "HH:mm" else "h:mm", Locale.ENGLISH))
+    val suffix = if (is24) null else if (now.hour < 12) "AM" else "PM"
 
-    Column(
-        Modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onTap = { state.start(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
-                onLongPress = { state.settingsOpen = true },
+    Box(
+        Modifier.pressable(
+            onTap = { state.start(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+            onLongPress = { state.settingsOpen = true },
+        )
+    ) {
+        DotText(timeText, pitch = 9.dp, color = p.text, spacing = 2)
+        if (suffix != null) {
+            DotText(
+                suffix,
+                pitch = 3.dp,
+                color = p.muted,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 40.dp),
             )
         }
-    ) {
-        BasicText(
-            timeText,
-            style = TextStyle(
-                color = p.text,
-                fontSize = 84.sp,
-                fontWeight = FontWeight.ExtraLight,
-                fontFamily = LauncherFont,
-                letterSpacing = (-2).sp,
-            ),
-        )
-        BasicText(
-            dateText,
-            style = TextStyle(
-                color = p.muted,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Light,
-                fontFamily = LauncherFont,
-            ),
-        )
+    }
+}
+
+@Composable
+private fun HomeGrid(apps: List<AppInfo>, state: LauncherState, notified: Set<String>) {
+    val p = LocalPalette.current
+
+    if (apps.isEmpty()) {
+        DotCard(Modifier.fillMaxWidth()) {
+            BasicText(
+                "SWIPE UP.\nLONG-PRESS AN APP.\nTAP \"ADD TO HOME\".",
+                style = mono(11f, p.muted, spacing = 1.6f).copy(textAlign = TextAlign.Center),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+            )
+        }
+        return
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        for (rowApps in apps.chunked(GRID_COLUMNS)) {
+            Row(Modifier.fillMaxWidth()) {
+                for (i in 0 until GRID_COLUMNS) {
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                        val app = rowApps.getOrNull(i)
+                        if (app != null) {
+                            AppTile(app, state, app.packageName in notified, Modifier.fillMaxWidth())
+                        }
+                    }
+                }
+            }
+        }
     }
 }
