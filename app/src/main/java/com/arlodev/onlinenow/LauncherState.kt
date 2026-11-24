@@ -1,5 +1,7 @@
 package com.arlodev.onlinenow
 
+import android.app.role.RoleManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -88,6 +90,18 @@ class LauncherState(private val appContext: Context) {
     var notificationAccess by mutableStateOf(false)
         private set
 
+    /** True when Online Now is the phone's home app. */
+    var isDefaultLauncher by mutableStateOf(false)
+        private set
+
+    /** The first-run / "Setup guide" dialog. */
+    var setupOpen by mutableStateOf(false)
+
+    /** Set by MainActivity: shows Android's "make this your home app?" pop-up. */
+    var homeRoleRequester: (() -> Unit)? = null
+
+    private var setupChecked = false
+
     /** How see-through the home screen is: 1 = solid black, lower lets the wallpaper show. */
     val homeAlpha: Float
         get() = when (backdrop) {
@@ -124,7 +138,47 @@ class LauncherState(private val appContext: Context) {
         } catch (_: Exception) {
             false
         }
+        isDefaultLauncher = try {
+            appContext.getSystemService(RoleManager::class.java)?.isRoleHeld(RoleManager.ROLE_HOME) == true
+        } catch (_: Exception) {
+            false
+        }
+
+        // First start: offer the setup guide once, unless everything is already done.
+        if (!setupChecked) {
+            setupChecked = true
+            if (!sp.getBoolean("setup_seen", false) && !(notificationAccess && isDefaultLauncher)) {
+                setupOpen = true
+            }
+        }
     }
+
+    fun dismissSetup() {
+        setupOpen = false
+        sp.edit().putBoolean("setup_seen", true).apply()
+    }
+
+    // ---- permissions ----
+    fun requestDefaultLauncher() {
+        val requester = homeRoleRequester
+        if (requester != null) requester() else start(Intent(Settings.ACTION_HOME_SETTINGS))
+    }
+
+    /** Opens Online Now's own page in the notification-access settings (falls back to the full list). */
+    fun openNotificationAccess() {
+        val component = ComponentName(appContext, NotificationService::class.java).flattenToString()
+        try {
+            val detail = Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS)
+                .putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME, component)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            appContext.startActivity(detail)
+        } catch (_: Exception) {
+            start(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+    }
+
+    /** Online Now's own App info page: the three-dot menu there has "Allow restricted settings". */
+    fun openOwnAppInfo() = openAppInfo(appContext.packageName)
 
     // ---- loading ----
     fun reloadApps() {

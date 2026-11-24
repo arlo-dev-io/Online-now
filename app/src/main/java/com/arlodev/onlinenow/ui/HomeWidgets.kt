@@ -8,7 +8,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
-import android.provider.Settings
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -330,7 +329,7 @@ fun MediaCard(state: LauncherState, modifier: Modifier = Modifier) {
                         if (current != null) {
                             state.launch(current.packageName)
                         } else if (!state.notificationAccess) {
-                            state.start(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                            state.openNotificationAccess()
                         }
                     })
             ) {

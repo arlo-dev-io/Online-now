@@ -1,7 +1,6 @@
 package com.arlodev.onlinenow.ui
 
 import android.content.Intent
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -102,6 +101,16 @@ fun SettingsScreen(state: LauncherState) {
 
         Group("Access") {
             ActionRow(
+                title = "Setup guide",
+                subtitle = "Default launcher, restricted settings, notification access",
+                action = "Open",
+            ) { state.setupOpen = true }
+            ActionRow(
+                title = "Default launcher",
+                subtitle = if (state.isDefaultLauncher) "ON  -  Home opens Online Now" else "OFF  -  Home opens another launcher",
+                action = if (state.isDefaultLauncher) "Change" else "Allow",
+            ) { state.requestDefaultLauncher() }
+            ActionRow(
                 title = "Notification access",
                 subtitle = if (state.notificationAccess) {
                     "ON  -  notification dots and music card work"
@@ -109,15 +118,10 @@ fun SettingsScreen(state: LauncherState) {
                     "OFF  -  needed for notification dots and the music card"
                 },
                 action = if (state.notificationAccess) "Manage" else "Allow",
-            ) {
-                state.start(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-            }
-            Hint("If it is greyed out: Settings > Apps > Online Now > three dots > Allow restricted settings.")
+            ) { state.openNotificationAccess() }
+            Hint("Greyed out or blocked? Open Setup guide, step 2: App info > three dots > Allow restricted settings.")
             ActionRow("Wallpaper", "Pick a new one", "Change") {
                 state.start(Intent.createChooser(Intent(Intent.ACTION_SET_WALLPAPER), "Wallpaper"))
-            }
-            ActionRow("Default launcher", "Make Online Now your home app", "Open") {
-                state.start(Intent(Settings.ACTION_HOME_SETTINGS))
             }
         }
 

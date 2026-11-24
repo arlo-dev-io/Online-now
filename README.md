@@ -42,9 +42,15 @@ Every push builds a signed APK with GitHub Actions. No Android Studio needed.
 3. Install it. New builds install over old ones because every build uses the same signing key.
 4. Press Home and choose **Online Now** as your home app.
 
-### Notification dots and the music card
-Both need notification access: Settings > Access > *Allow*.
-If the switch is greyed out: Settings > Apps > Online Now > three dots > **Allow restricted settings**, then try again.
+### Permissions (first-run setup)
+On first start Online Now shows a **Setup** dialog (reopen it any time: Settings > Access > *Setup guide*). Android only allows these from system screens, so each button jumps straight to the right place:
+
+1. **Default launcher**: Android shows a "make this your home app?" pop-up. Tap *Online Now*, then *Set as default*.
+2. **Restricted settings**: because the app is installed from a file, Android may block step 3. The button opens *App info*. Tap the **three dots (top right) > Allow restricted settings**.
+   (If the three dots are missing, do step 3 first, tap the blocked switch once, then come back here.)
+3. **Notification access**: opens Online Now's page. Turn it on. This enables the music card and notification dots.
+
+The status dots in the dialog turn green when each step is done.
 
 ## Gestures
 

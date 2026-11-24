@@ -61,6 +61,8 @@ fun LauncherRoot(state: LauncherState) {
             if (state.settingsOpen) SettingsScreen(state)
 
             state.menuApp?.let { AppMenu(it, state) }
+
+            if (state.setupOpen) SetupDialog(state)
         }
     }
 }
